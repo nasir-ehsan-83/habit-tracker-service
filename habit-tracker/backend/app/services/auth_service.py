@@ -3,7 +3,7 @@ from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 
 from app.models.user import User
 from app.core.security import verify
-from app.core.oauth2 import create_access_token
+from app.core.oauth2 import create_access_token, create_refresh_token
 
 async def login(user_credential: OAuth2PasswordRequestForm) :
     # get user from database
@@ -30,7 +30,12 @@ async def login(user_credential: OAuth2PasswordRequestForm) :
         "role": user.role
     })
 
+    refresh_token = await create_refresh_token(data = {
+        "user_id" : str(user.id)
+    })
+
     return {
         "access_token": access_token,
+        "refresh_token": refresh_token,
         "token_type": "bearer"
     }
