@@ -13,3 +13,8 @@ router = APIRouter(
 async def user_login(user_credential: Annotated[OAuth2PasswordRequestForm, Depends()]):
 
     return await login(user_credential)
+
+@router.post('/refresh')
+async def refresh(token: str):
+    
+    return await refresh_access_token(token)
