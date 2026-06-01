@@ -14,7 +14,7 @@ class UserCreate(UserBase):
     password: str = Field(min_length = 8)
 
 class UserPrivateOut(UserBase):
-    id: Optional[str] = Field(alias = "_id")
+    _id: Optional[str] = Field(alias = "_id")
 
     model_config = ConfigDict(
         from_attributes = True, 
@@ -29,7 +29,7 @@ class UserPrivateOut(UserBase):
         return 
 
 class UserAdminOut(UserBase):
-    id: str = Field(alias = "_id")
+    _id: str = Field(alias = "_id")
     status: UserStatus
     role: UserRole
     created_at: datetime
