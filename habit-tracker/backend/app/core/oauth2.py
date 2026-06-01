@@ -42,7 +42,7 @@ async def verify_access_token(token: str, credentials_exception: str):
             algorithms = [ALGORITHM]
         )
 
-        if payload.get("type") is not "access":
+        if payload.get("type") != "access":
             raise credentials_exception
         
         id: str = payload.get("user_id")
@@ -76,14 +76,14 @@ async def create_refresh_token(data: Dict):
 async def verify_refresh_token(token: str, credentials_exception: str):
 
     try:
-        payload = run_in_threadpool(
+        payload = await run_in_threadpool(
             jwt.decode,
             token,
             REFRESH_SECRET_KEY,
             algorithm = [ALGORITHM]
         )
 
-        if payload.get("type") is not "refresh":
+        if payload.get("type") != "refresh":
             raise credentials_exception
         
         return payload
