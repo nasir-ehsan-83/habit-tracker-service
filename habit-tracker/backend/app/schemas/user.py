@@ -16,7 +16,10 @@ class UserCreate(UserBase):
 class UserPrivateOut(UserBase):
     id: Optional[str] = Field(alias = "_id")
 
-    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+    model_config = ConfigDict(
+        from_attributes = True, 
+        populate_by_name = True
+    )
 
     @field_validator("id", mode="before")
     @classmethod
@@ -26,13 +29,16 @@ class UserPrivateOut(UserBase):
         return 
 
 class UserAdminOut(UserBase):
-    id: str = Field(aliase = "_id")
+    id: str = Field(alias = "_id")
     status: UserStatus
     role: UserRole
     created_at: datetime
     updated_at: datetime
     
-    model_config = ConfigDict(from_attributes = True, populate_by_name = True)
+    model_config = ConfigDict(
+        from_attributes = True, 
+        populate_by_name = True
+    )
 
     @field_validator("id", mode = "before")
     @classmethod

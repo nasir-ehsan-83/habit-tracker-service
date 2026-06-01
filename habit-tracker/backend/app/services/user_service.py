@@ -61,7 +61,7 @@ async def get_user_by_email(email: str, current_user: TokenData) -> User:
     user = await User.find_one(
         User.email == email,
         User.id == int(current_user.id),
-        User.srarus == "active"
+        User.status == "active"
     )
 
     # if user does not exist by specific email and id

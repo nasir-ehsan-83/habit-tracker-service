@@ -23,11 +23,18 @@ class HabitAdminOut(HabitBase):
     created_at: date
     updated_at: date
 
-    model_config = ConfigDict(from_attributes = True, populate_by_name = True)
+    model_config = ConfigDict(
+        from_attributes = True, 
+        populate_by_name = True
+    )
 
 class HabitUpdate(BaseModel):
-    name: Optional[str] = Field(default = None, min_lenght = 3, max_length = 50)
+    name: Optional[str] = Field(
+        default = None, 
+        min_lenght = 3, 
+        max_length = 50
+    )
     status: Optional[HabitStatus] = Field(default = None)
-    remind: Optional[time] = Field(default = None)
+    remind_time: Optional[time] = Field(default = None)
     start_date: Optional[date] = Field(default = None)
     end_date: Optional[date] = Field(default = None)
