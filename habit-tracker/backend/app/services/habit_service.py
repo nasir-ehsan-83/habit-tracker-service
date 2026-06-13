@@ -40,7 +40,7 @@ async def create_new_habit(habit_in: HabitCreate, current_user: TokenData) -> Ha
         )
 
 
-async def get_all_habits_owner(current_user: TokenData, page: int = 1, limit = 10) -> List[Habit]:
+async def get_all_habits_owner(current_user: TokenData, page: int = 1, limit: int = 10) -> List[Habit]:
     # calculate skip and limit values
     skip, limit = paginate(page, limit)
     
@@ -113,7 +113,10 @@ async def update_habit_by_name(name: str, update_habit: HabitUpdate, current_use
         "$set": update_data
     })
     
-    return await Habit.get(existing_habit.id)
+    # sync local object fields with database changes
+    await existing_habit.sync()
+    
+    return existing_habit
     
 
 async def delete_habit_by_name(name: str, current_user: TokenData):
