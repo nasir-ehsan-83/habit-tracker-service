@@ -60,7 +60,7 @@ async def get_user_by_email(email: str, current_user: TokenData) -> User:
     # get user from database 
     user = await User.find_one(
         User.email == email,
-        User.id == int(current_user.id),
+        User.id == current_user.id,
         User.status == "active"
     )
 
@@ -80,7 +80,7 @@ async def update_user_by_email(data: UserUpdate, current_user: TokenData) -> Use
     # get user from database
     user = await User.find_one(
         User.email == data.email,
-        User.id == int(current_user.id),
+        User.id == current_user.id,
         User.status == "active"
     )
 
@@ -117,7 +117,7 @@ async def delete_user_by_email(email: str, current_user: TokenData):
     # find the user from database
     user = await User.find_one(
         User.email == email,
-        User.id == int(current_user.id),
+        User.id == current_user.id,
         User.status == "active"
     )
 
