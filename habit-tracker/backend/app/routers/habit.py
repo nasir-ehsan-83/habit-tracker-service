@@ -16,7 +16,7 @@ from app.services.habit_service import(
     get_all_habits_owner,
     get_all_habits_admin, 
     get_habit_by_name,
-    udpdate_habit_by_name,
+    update_habit_by_name,
     delete_habit_by_name
 )
 
@@ -56,7 +56,7 @@ async def get_habit(name: str, current_user: TokenData = Depends(get_current_use
 @router.put('/name', response_model = HabitPrivateOut)
 async def update_habit(name: str, update_habit: HabitUpdate, current_user: TokenData = Depends(get_current_user)) -> Habit:
     
-    return await udpdate_habit_by_name(name, update_habit, current_user)
+    return await update_habit_by_name(name, update_habit, current_user)
 
 
 @router.delete('/name')
