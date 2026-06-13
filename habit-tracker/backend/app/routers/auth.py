@@ -1,19 +1,23 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request, Response
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from typing import Annotated
 
 from app.schemas.token import Token
-from app.services.auth_service import login, refresh_access_token
+from app.services.auth_service import handle_login, handle_refresh_token, handle_logout
 
 router = APIRouter(
     tags = ["Authentication"]
 )
 
 @router.post('/login', response_model = Token)
-async def user_login(user_credential: Annotated[OAuth2PasswordRequestForm, Depends()]):
+async def login(response: Response, user_credential: Annotated[OAuth2PasswordRequestForm, Depends()]):
 
-    return await login(user_credential)
+    return await handle_login(response, user_credential)
 
-@router.post('/refresh')
-async def refresh(refresh_token: str):
-    return await refresh_access_token(refresh_token)
+@router.get('/refresh', response_model = Token)
+async def refresh(request: Request):
+    return await handle_refresh_token(request)
+
+@router.get('/logout')
+async def logout(request: Request):
+    return await handle_logout(request)

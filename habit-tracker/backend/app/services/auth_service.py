@@ -1,81 +1,157 @@
-from typing import Dict, Optional
-from fastapi import HTTPException, Request, status, Response
-from fastapi.security.oauth2 import OAuth2PasswordRequestForm 
+from typing import Dict
+from fastapi import (
+    HTTPException,
+    Request,
+    Response,
+    status
+)
+from fastapi.security import OAuth2PasswordRequestForm
 
 from app.models.user import User
 from app.core.security import verify
-from app.core.oauth2 import create_access_token, create_refresh_token, verify_refresh_token
+from app.core.oauth2 import (
+    create_access_token,
+    create_refresh_token,
+    verify_refresh_token
+)
 
-async def login(user_credential: OAuth2PasswordRequestForm) -> Optional[Dict]:
+
+async def handle_login(response: Response, user_credential: OAuth2PasswordRequestForm ) -> Dict:
     # get user from database
     user = await User.find_one(User.username == user_credential.username)
 
-    # if specific user does not exist
+    # if user not found
     if not user:
         raise HTTPException(
-            status_code = status.HTTP_404_NOT_FOUND,
-            detail = "Invalid credential"
+            status_code = status.HTTP_401_UNAUTHORIZED,
+            detail = "Invalid credentials"
         )
 
-    # else verify password
-
+    # if user found but is inactive or deleted
+    if user.status != "active":
+        raise HTTPException(
+            staus_code = status.HTTP_403_FORBIDDEN,
+            detail = "User account is inactive"
+        )
+    
+    # verify password 
     if not await verify(user_credential.password, user.password):
-        raise HTTPException (
-            status_code = status.HTTP_404_NOT_FOUND,
-            detail = "Invalid credential"
+        raise HTTPException(
+            status_code = status.HTTP_401_UNAUTHORIZED,
+            detail = "Invalid credentials"
         )
 
-    # create acsess token
-    access_token = await create_access_token(data = {
-        "user_id": str(user.id),
+    # create JWT access-token 
+    access_token = await create_access_token({
+        "id": str(user.id),
         "role": user.role
     })
 
-    # create refresh token
-    refresh_token = await create_refresh_token(data = {
-        "user_id" : str(user.id)
+    # create JWT refresh-token
+    refresh_token = await create_refresh_token({
+        "id": str(user.id),
+        "role": user.role
     })
 
-    # save refresh-token in database
-    user_with_refresh_token = user.update({refresh_token: refresh_token})
-    
-    # update user after adding refresh token
-    await user.set(user_with_refresh_token)
-    
-    return ({
-        "access_token": access_token,
-        "token_type": "bearer"
-        }, 
-        # return refresh token as cookie
-        Response.set_cookie("jwt",refresh_token, max_age = 24 * 60 * 60 * 1000, httponly = True)
+    # add refresh token to database
+    await user.update({
+        "$set": {
+            "refresh_token": refresh_token
+        }
+    })
+
+    # return refresh-token as cookie
+    response.set_cookie(
+        key = "jwt",
+        value = refresh_token,
+        httponly = True,
+        max_age = 7 * 24 * 60 * 60
     )
 
+    # return access-token
+    return {
+        "access_token": access_token,
+        "token_type": "bearer"
+    }
 
-async def refresh_access_token(request: Request) -> Optional[Dict]:
 
-    cookie = request.cookies
+async def handle_refresh_token(request: Request) -> Dict:
+    # get refresh-token from cookies
+    refresh_token = request.cookies.get("jwt")
 
-    if not cookie.jwt:
-        raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED)
-    
-    refresh_token = cookie.jwt
+    # if refresh-token not exists
+    if not refresh_token:
+        raise HTTPException(
+            status_code = status.HTTP_401_UNAUTHORIZED,
+            detail = "Refresh token not found"
+        )
 
-    payload = verify_refresh_token(refresh_token)
+    payload = await verify_refresh_token(refresh_token)
 
-    if not payload:
+    # get user form database
+    user = await User.get(payload["id"])
+
+    # if user not found
+    if not user:
+        raise HTTPException(
+            status_code = status.HTTP_401_UNAUTHORIZED,
+            detail = "User not found"
+        )
+
+    # if user is inactive or deleted
+    if user.status != "active":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User account is inactive"
+        )
+
+    # verify refresh-token with user.refresh_token
+    if user.refresh_token != refresh_token:
         raise HTTPException(
             status_code = status.HTTP_401_UNAUTHORIZED,
             detail = "Invalid refresh token"
         )
-    
-    new_access_token = create_access_token(
-        data = {
-            "user_id": payload["user_id"],
-            "user_role": payload["user_role"]
-        }
-    )
 
+    # create new JWT access-token
+    access_token = await create_access_token({
+        "id": payload["id"],
+        "role": payload["role"]
+    })
+
+    # retun new access-token
     return {
-        "access_token": new_access_token,
+        "access_token": access_token,
         "token_type": "bearer"
     }
+
+
+async def handle_logout(request: Request):
+    # get refresh-token from cookies
+    refresh_token = request.cookies.get("jwt")
+
+    response = Response(status_code = status.HTTP_204_NO_CONTENT)
+
+    # if refresh-token not found
+    if not refresh_token:
+        response.delete_cookie("jwt")
+        return response
+
+    try:
+        payload = await verify_refresh_token(refresh_token)
+        # get user form datbase by id
+        user = await User.get(payload["id"])
+        
+        # if user found 
+        if user:
+            await user.update({
+                "$set": {
+                    "refresh_token": None
+                }
+            })
+
+    except Exception:
+        pass
+
+    response.delete_cookie("jwt")
+
+    return response
