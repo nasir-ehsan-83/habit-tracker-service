@@ -21,7 +21,7 @@ class UserPrivateOut(UserBase):
         populate_by_name = True
     )
 
-    @field_validator("id", mode="before")
+    @field_validator("_id", mode = "before")
     @classmethod
     def convert_objectid(cls, v):
         if isinstance(v, ObjectId):
