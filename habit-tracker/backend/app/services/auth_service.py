@@ -1,5 +1,5 @@
 from typing import Dict, Optional
-from fastapi import HTTPException, status
+from fastapi import HTTPException, Request, status, Response
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm 
 
 from app.models.user import User
@@ -36,14 +36,29 @@ async def login(user_credential: OAuth2PasswordRequestForm) -> Optional[Dict]:
         "user_id" : str(user.id)
     })
 
-    return {
+    # save refresh-token in database
+    user_with_refresh_token = user.update({refresh_token: refresh_token})
+    
+    # update user after adding refresh token
+    await user.set(user_with_refresh_token)
+    
+    return ({
         "access_token": access_token,
-        "refresh_token": refresh_token,
         "token_type": "bearer"
-    }
+        }, 
+        # return refresh token as cookie
+        Response.set_cookie("jwt",refresh_token, max_age = 24 * 60 * 60 * 1000, httponly = True)
+    )
 
 
-async def refresh_access_token(refresh_token: str) -> Optional[Dict]:
+async def refresh_access_token(request: Request) -> Optional[Dict]:
+
+    cookie = request.cookies
+
+    if not cookie.jwt:
+        raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED)
+    
+    refresh_token = cookie.jwt
 
     payload = verify_refresh_token(refresh_token)
 
