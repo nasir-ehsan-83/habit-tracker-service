@@ -1,13 +1,13 @@
 from datetime import datetime, timezone, date, time
 from pydantic import Field, model_validator
-from beanie import Document
+from beanie import Document, PydanticObjectId
 from pymongo import ASCENDING, IndexModel
 
 from app.utils.enum import HabitStatus
 
 class Habit(Document):
     name: str = Field(min_length=1)
-    owner_id: int
+    owner_id: PydanticObjectId
     status: HabitStatus = HabitStatus.pending
     
     remind_time: time 
