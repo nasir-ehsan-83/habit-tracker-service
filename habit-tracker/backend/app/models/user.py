@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from typing import Optional
 from pydantic import EmailStr, Field
 from pymongo import IndexModel, ASCENDING
 from beanie import Document
@@ -17,6 +18,8 @@ class User(Document):
     created_at: datetime = Field(default_factory = lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory = lambda: datetime.now(timezone.utc))
 
+    refresh_token: Optional[str]
+    
     class Settings:
         name = "users"
         # Correct way to define unique indexes in Beanie Settings
