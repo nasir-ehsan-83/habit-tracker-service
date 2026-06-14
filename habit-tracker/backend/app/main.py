@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi_offline_docs.offline_docs import setup_offline_docs
 
 from app.db.database import init_db
-from app.routers import user, habit
+from app.routes import user, habit
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
