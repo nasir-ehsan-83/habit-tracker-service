@@ -1,12 +1,24 @@
 from typing import List, Optional
-from fastapi import HTTPException, Response, status
+from fastapi import (
+    HTTPException, 
+    Response, 
+    status
+)
 from pymongo.errors import DuplicateKeyError
-from datetime import datetime, timezone
-
+from datetime import (
+    datetime, 
+    timezone
+)
 from app.models.habit import Habit
-from app.schemas.habit import HabitCreate, HabitUpdate
+from app.schemas.habit import (
+    HabitCreate, 
+    HabitUpdate
+)
 from app.schemas.token import TokenData
 from app.utils.pagination import paginate
+
+
+
 
 async def create_new_habit(habit_in: HabitCreate, current_user: TokenData) -> Habit:
     

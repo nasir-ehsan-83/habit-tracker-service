@@ -1,9 +1,18 @@
-from fastapi import APIRouter, Depends, Request, Response
+from fastapi import (
+    APIRouter, 
+    Depends, 
+    Request, 
+    Response
+)
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from typing import Annotated
 
 from app.schemas.token import Token
-from app.services.auth_service import handle_login, handle_refresh_token, handle_logout
+from app.services.auth_service import (
+    handle_login, 
+    handle_refresh_token, 
+    handle_logout
+)
 
 router = APIRouter(
     tags = ["Authentication"]

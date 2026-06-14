@@ -1,10 +1,22 @@
-from datetime import datetime, timezone
 from typing import Optional
-from pydantic import EmailStr, Field
-from pymongo import IndexModel, ASCENDING
+from datetime import (
+    datetime, 
+    timezone
+)
+from pydantic import (
+    EmailStr, 
+    Field
+)
 from beanie import Document
+from pymongo import (
+    IndexModel, 
+    ASCENDING
+)
 
-from app.utils.enum import UserRole, UserStatus
+from app.utils.enum import (
+    UserRole, 
+    UserStatus
+)
 
 class User(Document):
     name: str

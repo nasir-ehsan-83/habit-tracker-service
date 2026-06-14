@@ -1,9 +1,24 @@
-from datetime import datetime, timezone, date, time
-from pydantic import Field, model_validator
-from beanie import Document, PydanticObjectId
-from pymongo import ASCENDING, IndexModel
-
+from datetime import (
+    datetime, 
+    timezone, 
+    date, 
+    time
+)
+from pydantic import (
+    Field, 
+    model_validator
+)
+from beanie import (
+    Document, 
+    PydanticObjectId
+)
+from pymongo import (
+    ASCENDING, 
+    IndexModel
+)
 from app.utils.enum import HabitStatus
+
+
 
 class Habit(Document):
     name: str = Field(min_length=1)

@@ -1,13 +1,25 @@
 from typing import Optional
-from pydantic import BaseModel, EmailStr, ConfigDict, Field, field_validator
+from pydantic import (
+    BaseModel, 
+    EmailStr, 
+    ConfigDict, 
+    Field, 
+    field_validator
+)
 from datetime import datetime
 from bson import ObjectId 
 
 from app.utils.enum import UserStatus, UserRole
 
 class UserBase(BaseModel):
-    name: str = Field(min_length = 3, max_length = 50)
-    username: str = Field(min_length = 3, max_length = 30)
+    name: str = Field(
+        min_length = 3, 
+        max_length = 50
+    )
+    username: str = Field(
+        min_length = 3, 
+        max_length = 30
+    )
     email: EmailStr
 
 class UserCreate(UserBase):
@@ -40,7 +52,7 @@ class UserAdminOut(UserBase):
         populate_by_name = True
     )
 
-    @field_validator("id", mode = "before")
+    @field_validator("_id", mode = "before")
     @classmethod
     def convert_objectid(cls, v):
         if isinstance(v, ObjectId):
