@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import (
     HTTPException, 
     Response, 
@@ -13,7 +14,7 @@ from app.schemas.token import TokenData
 from app.utils.pagination import paginate
 
 # create new user and add to database
-async def create_user(user: UserCreate):
+async def create_user(user: UserCreate) -> User:
     # if user already exists by specific email
     if await User.find_one(User.email == user.email):
         raise HTTPException(
@@ -31,7 +32,7 @@ async def create_user(user: UserCreate):
     # else 
     try :
         new_user = User(
-            *user.model_dump(exclude = {"password"}),
+            **user.model_dump(exclude = {"password"}),
             password = await hash(user.password)
         )
 
@@ -47,7 +48,7 @@ async def create_user(user: UserCreate):
 
 
 # get all users from database by admin access
-async def get_all_users(page: int = 1, limit: int = 10):
+async def get_all_users(page: int = 1, limit: int = 10) -> List[User]:
     
     
     skip, limit = paginate(page, limit)
@@ -79,20 +80,19 @@ async def get_user_by_email(email: str, current_user: TokenData) -> User:
 async def update_user_by_email(data: UserUpdate, current_user: TokenData) -> User:
     # get user from database
     user = await User.find_one(
-        User.email == data.email,
         User.id == current_user.id,
         User.status == "active"
     )
 
     # if user does not exist 
     if not user:
-        return HTTPException(
+        raise HTTPException(
             status_code = status.HTTP_404_NOT_FOUND,
             detail = "User not found"
         )
     
     # delete undefined or null values
-    update_data = data.update_data.model_dump(
+    update_data = data.model_dump(
         exclude_unset = True, 
         exclude_none = True
     )
@@ -109,7 +109,8 @@ async def update_user_by_email(data: UserUpdate, current_user: TokenData) -> Use
     })
 
     # get user by updated infromation
-    return await User.get(user.id)
+    await user.sync()
+    return user
 
 
 # delete user from database
