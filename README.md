@@ -11,7 +11,6 @@ A professional-grade backend service built with **FastAPI** and **MongoDB**, int
 - [Getting Started](#-getting-started)
 - [Testing](#-testing)
 - [Roadmap](#-roadmap)
-- [Author](#-author)
 
 ---
 
@@ -40,7 +39,7 @@ This module contains high-performance implementations of core computer science c
 ---
 
 ## 🛠 Tech Stack
-*   **Backend:** Python 3.10+, FastAPI, Beanie ODM
+*   **Backend:** Python 3.10+, FastAPI, Beanie-ODM, JWT
 *   **Database:** MongoDB
 *   **Frontend:** React (Under Development)
 *   **Environment:** Linux (Fedora), Git
@@ -57,7 +56,7 @@ This module contains high-performance implementations of core computer science c
 ### Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com
+   git clone https://github.com/nasir-ehsan-83/habit-tracker-service.git
    ```
 2. Navigate to the backend directory:
    ```bash
@@ -85,9 +84,9 @@ pytest data_structure_algorithm/tests
 
 ## 🔮 Roadmap
 - [ ] Implement JWT-based User Authentication.
-- [ ] Complete the React-based dashboard.
 - [ ] Add data export features (CSV/JSON).
 - [ ] Integrate AI-based habit suggestions.
+<!-- - [ ] Complete the React-based dashboard. -->
 
 ---
 
