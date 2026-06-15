@@ -42,7 +42,7 @@ async def get_habits_owner(current_user: TokenData = Depends(get_current_user), 
 
 # get all habits of all usres by admin access
 @router.get('/only-admin', response_model = List[HabitPrivateOut])
-async def get_habits_admin(owner_id: Optional[int] = None, page: int = 1, limit: int = 10, user = Depends(require_role("admin"))) -> List[Habit]:
+async def get_habits_admin(owner_id: Optional[int] = None, page: int = 1, limit: int = 10, user = Depends(require_role(2020))) -> List[Habit]:
     
     return await get_all_habits_admin(owner_id, page, limit)
 

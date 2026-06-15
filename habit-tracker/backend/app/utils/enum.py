@@ -1,8 +1,8 @@
 from enum import Enum
 
-class UserRole(str, Enum):
-    user = "user"
-    admin = "admin"
+class UserRole(int, Enum):
+    user = 1789
+    admin = 2020
 
 class UserStatus(str, Enum):
     active = "active"
@@ -13,3 +13,4 @@ class HabitStatus(str, Enum):
     completed = "completed"
     skipped = "skipped"
     deleted = "deleted"
+
