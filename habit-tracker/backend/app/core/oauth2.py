@@ -13,7 +13,7 @@ from fastapi import (
 from fastapi.concurrency import run_in_threadpool
 
 from app.schemas.token import TokenData
-from app.core.confing import settings
+from app.core.config import settings
 
 # secret key
 ACCESS_SECRET_KEY = settings.ACCESS_SECRET_KEY

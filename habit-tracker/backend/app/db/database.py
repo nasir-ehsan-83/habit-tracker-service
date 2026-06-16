@@ -1,7 +1,7 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from beanie import init_beanie
 
-from app.core.confing import settings
+from app.core.config import settings
 from app.models.user import User
 from app.models.habit import Habit
 
