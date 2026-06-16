@@ -63,7 +63,7 @@ async def get_all_habits_owner(current_user: TokenData, page: int = 1, limit: in
     ).skip(skip).limit(limit).to_list()
 
 
-async def get_all_habits_admin(owner_id: Optional[int] = None, page: int = 1, limit: int = 10) -> List[Habit]:
+async def get_all_habits_admin(owner_id: Optional[str] = None, page: int = 1, limit: int = 10) -> List[Habit]:
     
     # calculate skip and limit values
     skip, limit = paginate(page, limit)

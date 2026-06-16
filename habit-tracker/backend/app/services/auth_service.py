@@ -30,7 +30,7 @@ async def handle_login(response: Response, user_credential: OAuth2PasswordReques
     # if user found but is inactive or deleted
     if user.status != "active":
         raise HTTPException(
-            staus_code = status.HTTP_403_FORBIDDEN,
+            status_code = status.HTTP_403_FORBIDDEN,
             detail = "User account is inactive"
         )
     
