@@ -70,8 +70,17 @@ async def verify_access_token(token: str,credentials_exception):
             role = role
         )
 
-    except JWTError:
+    # jwt-exception
+    except JWTError as error:
         raise credentials_exception
+    
+    except Exception as error:
+        # unwanted exception
+        raise HTTPException(
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail = "Internal server error"
+        )
+
 
 async def create_refresh_token(data: Dict):
     to_encode = data.copy()
@@ -109,10 +118,17 @@ async def verify_refresh_token(token: str):
             )
 
         return payload
-
-    except JWTError:
-
+    
+    # jwt-excetion 
+    except JWTError as error:
         raise HTTPException(
             status_code = status.HTTP_401_UNAUTHORIZED,
             detail = "Invalid refresh token"
+        )
+
+    # other exceptoins
+    except Exception as error:
+        raise HTTPException(
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail = "Internal server error"
         )
