@@ -31,22 +31,21 @@ app = FastAPI(
 
 setup_offline_docs(app)
 
-# add cores middleware
+# add cors middleware
 app.add_middleware(
     CORSMiddleware,
-    alowed_origins = [
+    allow_origins = [
         "http://localhost:3000",    # for react dev
         "http://127.0.0.1:5500",    # for liveserver
         "https://www.google.com"    # for google
     ],
-    alowed_credintials = True,
-    alowed_methods = ["GET, POST, DELETE, PATCH", "PUT"],
-    alowed_headers = ["*"]
+    allow_credentials = True,
+    allow_methods = ["GET", "POST", "DELETE", "PATCH", "PUT"],
+    allow_headers = ["*"]
 )
 
 # add rate-limit
 app.state.limiter = limiter
-
 # add handler for rate-limit
 @app.exception_handler(RateLimitExceeded)
 async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
