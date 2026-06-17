@@ -1,0 +1,12 @@
+# habit-tracker/.dockerignore
+
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.log
+.env
+.git
+.gitignore
+README.md
+data_structure_algorithm/
