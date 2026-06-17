@@ -4,12 +4,13 @@ from typing import (
 )
 from fastapi import (
     APIRouter, 
-    Depends
+    Depends,
+    Request
 )
 from app.models.habit import Habit
 from app.dependencies.current_user import get_current_user
 from app.dependencies.roles import require_role
-from schemas.token import TokenData
+from app.schemas.token import TokenData
 from app.utils.limiter import limiter
 from app.schemas.habit import (
     HabitCreate, 
@@ -35,7 +36,7 @@ router = APIRouter(
 
 @router.post('/', response_model = HabitPrivateOut)
 @limiter.limit('3/minute')
-async def create_habit(habit: HabitCreate, current_user: TokenData = Depends(get_current_user)) -> Habit:
+async def create_habit(request: Request, habit: HabitCreate, current_user: TokenData = Depends(get_current_user)) -> Habit:
     
     return await create_new_habit(habit, current_user)
 

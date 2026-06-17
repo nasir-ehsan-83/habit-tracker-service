@@ -21,12 +21,12 @@ router = APIRouter(
 
 @router.post('/login', response_model = Token)
 @limiter.limit('5/minute')
-async def login(response: Response, user_credential: Annotated[OAuth2PasswordRequestForm, Depends()]):
+async def login(request: Request, user_credential: Annotated[OAuth2PasswordRequestForm, Depends()]):
 
-    return await handle_login(response, user_credential)
+    return await handle_login(request, user_credential)
 
 @router.get('/refresh', response_model = Token)
-@limiter.limit('5/minut')
+@limiter.limit('5/minute')
 async def refresh(request: Request):
     return await handle_refresh_token(request)
 

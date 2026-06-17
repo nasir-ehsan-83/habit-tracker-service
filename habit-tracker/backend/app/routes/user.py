@@ -1,6 +1,7 @@
 from fastapi import (
     APIRouter, 
-    Depends
+    Depends,
+    Request
 )
 from typing import List
 
@@ -31,7 +32,7 @@ router = APIRouter(
 # create new user
 @router.post('/', response_model = UserPrivateOut)
 @limiter.limit('3/minute')
-async def create_new_user(user_in: UserCreate) -> User:
+async def create_new_user(request: Request, user_in: UserCreate) -> User:
     
     return await create_user(user_in)
 

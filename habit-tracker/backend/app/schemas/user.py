@@ -26,22 +26,22 @@ class UserCreate(UserBase):
     password: str = Field(min_length = 8)
 
 class UserPrivateOut(UserBase):
-    _id: Optional[str] = Field(alias = "_id")
+    id: Optional[str] = Field(None, alias = "_id")
 
     model_config = ConfigDict(
         from_attributes = True, 
         populate_by_name = True
     )
 
-    @field_validator("_id", mode = "before")
+    @field_validator("id", mode = "before")
     @classmethod
     def convert_objectid(cls, v):
         if isinstance(v, ObjectId):
             return str(v)
-        return 
-
+        return v
+    
 class UserAdminOut(UserBase):
-    _id: str = Field(alias = "_id")
+    id: str = Field(alias = "_id")
     status: UserStatus
     role: UserRole
     created_at: datetime
@@ -52,13 +52,13 @@ class UserAdminOut(UserBase):
         populate_by_name = True
     )
 
-    @field_validator("_id", mode = "before")
+    @field_validator("id", mode = "before")
     @classmethod
     def convert_objectid(cls, v):
         if isinstance(v, ObjectId):
             return str(v)
-        return 
-
+        return v 
+    
 class UserUpdateBase(BaseModel):
     name: Optional[str] = None
     username: Optional[str] = None

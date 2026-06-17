@@ -10,7 +10,7 @@ from slowapi.errors import RateLimitExceeded
 
 from fastapi_offline_docs.offline_docs import setup_offline_docs
 
-from app.utils.limitter import limiter
+from app.utils.limiter import limiter
 from app.db.database import init_db
 from app.routes import (
     auth, 
