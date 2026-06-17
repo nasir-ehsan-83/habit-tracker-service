@@ -1,10 +1,14 @@
-from fastapi import APIRouter, Depends
+from fastapi import (
+    APIRouter, 
+    Depends
+)
 from typing import List
 
 from app.dependencies.current_user import get_current_user
 from app.dependencies.roles import require_role
 from app.models.user import User
 from app.schemas.token import TokenData
+from app.utils.limiter import limiter
 from app.schemas.user import (
     UserCreate, 
     UserPrivateOut, 
@@ -26,6 +30,7 @@ router = APIRouter(
 
 # create new user
 @router.post('/', response_model = UserPrivateOut)
+@limiter.limit('3/minute')
 async def create_new_user(user_in: UserCreate) -> User:
     
     return await create_user(user_in)
