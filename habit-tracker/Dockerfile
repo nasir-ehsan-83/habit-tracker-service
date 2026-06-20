@@ -2,16 +2,17 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# copy all requirements libraries
+# Copy dependency requirements file
 COPY requirements.txt .
 
-RUN pip install --no-chache-dir -r requirements.txt
+# Install dependencies without storing pip cache
+RUN pip install --no-cache-dir -r requirements.txt
 
-# copy project's file
+# Copy application source code
 COPY /app ./app
 
-# port that project run on it
+# Expose the application port
 EXPOSE 8000
 
-# to run project
+# Command to run the application using uvicorn
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
