@@ -9,7 +9,6 @@ RUN pip install --no-chache-dir -r requirements.txt
 
 # copy project's file
 COPY /app ./app
-COPY fastapi_offline_docs ./fastapi_offline_docs
 
 # port that project run on it
 EXPOSE 8000
