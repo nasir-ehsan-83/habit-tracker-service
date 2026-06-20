@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+import uvicorn
 from fastapi import (
     FastAPI,
     Request,
@@ -7,8 +8,6 @@ from fastapi import (
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from slowapi.errors import RateLimitExceeded
-
-from fastapi_offline_docs.offline_docs import setup_offline_docs
 
 from app.utils.limiter import limiter
 from app.db.database import init_db
@@ -29,7 +28,7 @@ app = FastAPI(
     lifespan = lifespan
 )
 
-setup_offline_docs(app)
+# setup_offline_docs(app)
 
 # add cors middleware
 app.add_middleware(
@@ -60,3 +59,6 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
 app.include_router(auth.router)
 app.include_router(user.router)
 app.include_router(habit.router)
+
+if "__name__" == "__main__":
+    uvicorn.run(app, host = "127.0.0.1", port = 8000, reload = True)

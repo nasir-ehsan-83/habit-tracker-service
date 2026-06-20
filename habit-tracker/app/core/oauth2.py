@@ -14,30 +14,30 @@ from fastapi.concurrency import run_in_threadpool
 
 from app.schemas.token import TokenData
 from app.core.config import settings
+from app.core.logging import logger
 
-# secret key
+# Secret keys
 ACCESS_SECRET_KEY = settings.ACCESS_SECRET_KEY
 REFRESH_SECRET_KEY = settings.REFRESH_SECRET_KEY
 
 ALGORITHM = settings.ALGORITHM
 
-# expire time
+# Expiration times
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
 REFRESH_TOKEN_EXPIRE_DAYS = settings.REFRESH_TOKEN_EXPIRE_DAYS
 
+
 async def create_access_token(data: Dict):
-
     to_encode = data.copy()
-
-    # create expire minutes
+    
+    # Calculate access token expiration
     expire = datetime.now(timezone.utc) + timedelta(minutes = ACCESS_TOKEN_EXPIRE_MINUTES)
-
     to_encode.update({
         "exp": expire,
         "type": "access"
     })
-
-    # create JWT access-token
+    
+    # Encode JWT access token in a threadpool
     return await run_in_threadpool(
         jwt.encode,
         to_encode,
@@ -45,10 +45,10 @@ async def create_access_token(data: Dict):
         ALGORITHM
     )
 
-async def verify_access_token(token: str,credentials_exception):
-    
+
+async def verify_access_token(token: str, credentials_exception):
     try:
-        # verify JWT token
+        # Decode and verify JWT access token
         payload = await run_in_threadpool(
             jwt.decode,
             token,
@@ -66,16 +66,18 @@ async def verify_access_token(token: str,credentials_exception):
             raise credentials_exception
 
         return TokenData(
-            id = id,
+            id = id, 
             role = role
         )
 
-    # jwt-exception
     except JWTError as error:
+        # exc_info=True includes the complete stack traceback in the logs
+        logger.error(f"JWT-Access-Token Error: {error}", exc_info = True)
         raise credentials_exception
     
     except Exception as error:
-        # unwanted exception
+        # Log unexpected internal server errors with full details
+        logger.error(f"Unexpected Access Token Exception: {error}", exc_info = True)
         raise HTTPException(
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail = "Internal server error"
@@ -84,15 +86,15 @@ async def verify_access_token(token: str,credentials_exception):
 
 async def create_refresh_token(data: Dict):
     to_encode = data.copy()
-
+    
+    # Calculate refresh token expiration
     expire = datetime.now(timezone.utc) + timedelta(days = REFRESH_TOKEN_EXPIRE_DAYS)
-
     to_encode.update({
         "exp": expire,
         "type": "refresh"
     })
-
-    # create JWT refresh-token
+    
+    # Encode JWT refresh token in a threadpool
     return await run_in_threadpool(
         jwt.encode,
         to_encode,
@@ -100,10 +102,10 @@ async def create_refresh_token(data: Dict):
         ALGORITHM
     )
 
-async def verify_refresh_token(token: str):
 
+async def verify_refresh_token(token: str):
     try:
-        # vreify refresh-token
+        # Decode and verify JWT refresh token
         payload = await run_in_threadpool(
             jwt.decode,
             token,
@@ -119,15 +121,17 @@ async def verify_refresh_token(token: str):
 
         return payload
     
-    # jwt-excetion 
     except JWTError as error:
+        # Log expired or corrupted refresh tokens
+        logger.error(f"JWT-Refresh-Token Error: {error}", exc_info = True)
         raise HTTPException(
             status_code = status.HTTP_401_UNAUTHORIZED,
             detail = "Invalid refresh token"
         )
 
-    # other exceptoins
     except Exception as error:
+        # Log any other unexpected exception during refresh verification
+        logger.error(f"Unexpected Refresh-Token Exception: {error}", exc_info = True)
         raise HTTPException(
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail = "Internal server error"
